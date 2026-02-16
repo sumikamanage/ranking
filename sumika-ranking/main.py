@@ -18,7 +18,7 @@ from bot import bot
 import ranking
 import messages_scan
 #flask起動
-from web_app.app import app
+from web_app import app
 
 
 # bot落ち防止のためのuptimerobot用,起動に必要
