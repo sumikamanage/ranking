@@ -28,10 +28,10 @@ class RANK(commands.Bot):
             self._log_control_loaded = True
 
 
-        # --- DBキュー（追加） ---
-        if not hasattr(self, "_db_worker_started"):
-            self.db_worker_task = asyncio.create_task(db_worker())
-            self._db_worker_started = True
+        # --- APIキュー ---
+        if not hasattr(self, "_api_worker_started"):
+            self.api_worker_task = asyncio.create_task(api_worker())
+            self._api_worker_started = True
 
     async def on_ready(self):
         if getattr(self, "_initialized", False):
