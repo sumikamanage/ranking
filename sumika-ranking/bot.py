@@ -12,7 +12,7 @@ from message_count import init_db
 intents = discord.Intents.all()
 
 
-from log_control import api_worker,setup_log_control_handlers
+from log_control import api_worker
 
 from log_control import db_queue, db_worker
 
@@ -22,11 +22,6 @@ class RANK(commands.Bot):
         # --- 拡張 ---
         if not self.extensions.get("Automod"):
             await self.load_extension("Automod")
-
-        if not hasattr(self, "_log_control_loaded"):
-            setup_log_control_handlers(self)
-            self._log_control_loaded = True
-
 
         # --- APIキュー ---
         if not hasattr(self, "_api_worker_started"):
