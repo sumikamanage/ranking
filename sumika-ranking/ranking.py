@@ -17,7 +17,7 @@ from message_count import (
 
 from config import FOOTER
 
-from bot_core.bot import bot
+from bot import bot
 
 footer=FOOTER
 
