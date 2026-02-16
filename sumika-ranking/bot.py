@@ -20,8 +20,9 @@ class RANK(commands.Bot):
 
     async def setup_hook(self):
         # --- 拡張 ---
-        if not self.extensions.get("Automod"):
-            await self.load_extension("Automod")
+        if not self.extensions.get("ranking_update"):
+            await self.load_extension("update")
+
 
         # --- APIキュー ---
         if not hasattr(self, "_api_worker_started"):
