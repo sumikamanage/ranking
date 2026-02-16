@@ -5,8 +5,6 @@ import asyncio
 
 from config import APP_ID, LOG_CHANNEL_ID
 
-from bot_core.start.start_log import send_startup_log
-
 from message_count import init_db
 # Bot設定
 intents = discord.Intents.all()
