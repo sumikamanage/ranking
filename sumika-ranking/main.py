@@ -14,8 +14,9 @@ from waitress import serve
 
 # 自作モジュール
 #botインスタンス読み込み
-from bot_core.bot import bot
-
+from bot import bot
+import ranking
+import messages_scan
 #flask起動
 from web_app.app import app
 
