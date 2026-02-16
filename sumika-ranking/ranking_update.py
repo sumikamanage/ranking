@@ -14,7 +14,7 @@ class update(commands.Cog):
     def is_exempt(self, member: discord.Member,
                   channel: discord.TextChannel):  #無敵のロールを持っているかどうか
         return (channel.id in EXEMPT_CHANNELS
-                or any(role.name in EXEMPT_ROLES for role in member.roles))
+                or any(role.name in EXCLUDED_ROLE for role in member.roles))
   
     @commands.Cog.listener()  #メッセージが送信されたとき
     async def on_message(self, message):  #メッセージが送信されたとき
@@ -33,9 +33,6 @@ class update(commands.Cog):
             return  # サーバーにいないユーザーなら無視
 
         if message.author.bot:
-            return
-
-        if message.channel.id in EXCLUDED_CHANNELS:
             return
 
         ctx = await bot.get_context(message)
