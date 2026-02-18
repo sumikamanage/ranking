@@ -42,6 +42,7 @@ print("🔄 サーバーを定義完了")
 
 async def main():
     async with bot:
+        await asyncio.sleep(30)
         await bot.start(TOKEN)
 
         
@@ -53,6 +54,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    await asyncio.sleep(30)
+    
     keep_alive()
     asyncio.run(main())
