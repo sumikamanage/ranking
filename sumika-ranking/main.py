@@ -4,7 +4,7 @@ import asyncio
 import time
 from datetime import datetime
 from threading import Thread
-import config
+from config import TOKEN
 
 import discord
 from discord.ext import commands
