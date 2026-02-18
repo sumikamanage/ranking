@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 from log_control import api_queue,db_queue
+from message_count import save_message_to_db
 
 EXCLUDED_ROLE = [1376867886525714464,1398231916171493480]
 EXEMPT_CHANNELS = [1276087091280871546, 1399620581766463639]  # 除外チャンネルID
