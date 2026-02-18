@@ -19,7 +19,7 @@ class RANK(commands.Bot):
     async def setup_hook(self):
         # --- 拡張 ---
         if not self.extensions.get("ranking_update"):
-            await self.load_extension("update")
+            await self.load_extension("ranking_update")
 
 
         # --- APIキュー ---
