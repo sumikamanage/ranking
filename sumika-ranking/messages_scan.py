@@ -2,7 +2,7 @@ import discord
 import asyncio
 import os
 from discord.ext import commands
-from bot_core.bot import bot
+from bot import bot
 import message_count
 from message_count import full_scan, log_worker
 from config import GUILD_ID
