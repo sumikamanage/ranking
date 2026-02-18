@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 import asyncio
 from log_control import api_queue,db_queue
 
