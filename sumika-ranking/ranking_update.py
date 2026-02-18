@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import asyncio
-from log_control import api_queue,db_queue
 from message_count import save_message_to_db
 
 EXCLUDED_ROLE = [1376867886525714464,1398231916171493480]
@@ -45,10 +44,10 @@ class update(commands.Cog):
 
           #ランキング処理
         try:
-            await db_queue.put(save_message_to_db(message))
+            await bot.db_queue.put(save_message_to_db(message))
         except Exception as e:
             channel= self.bot.get_channel(1276087091280871546)
-            await api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
+            await bot.api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
 
 async def setup(bot):
     await bot.add_cog(update(bot))
