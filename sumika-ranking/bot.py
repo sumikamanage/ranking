@@ -9,12 +9,13 @@ from message_count import init_db
 # Bot設定
 intents = discord.Intents.all()
 
-
-from log_control import api_worker
-
-from log_control import db_queue, db_worker
-
 class RANK(commands.Bot):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.api_queue = asyncio.Queue()
+        self.db_queue = asyncio.Queue()
 
     async def setup_hook(self):
         # --- 拡張 ---
