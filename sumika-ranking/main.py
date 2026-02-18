@@ -53,6 +53,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.sleep(30)
+    await asyncio.sleep(30)
     keep_alive()
     asyncio.run(main())
