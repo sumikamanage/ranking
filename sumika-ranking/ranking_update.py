@@ -15,7 +15,7 @@ class update(commands.Cog):
     def is_exempt(self, member: discord.Member,
                   channel: discord.TextChannel):  #無敵のロールを持っているかどうか
         return (channel.id in EXEMPT_CHANNELS
-                or any(role.name in EXCLUDED_ROLE for role in member.roles))
+                or any(role.id in EXCLUDED_ROLE for role in member.roles))
   
     @commands.Cog.listener()  #メッセージが送信されたとき
     async def on_message(self, message):  #メッセージが送信されたとき
@@ -36,7 +36,7 @@ class update(commands.Cog):
         if message.author.bot:
             return
 
-        ctx = await bot.get_context(message)
+        ctx = await self.bot.get_context(message)
         if ctx.command is not None:
             return
         
@@ -48,3 +48,6 @@ class update(commands.Cog):
         except Exception as e:
             channel= self.bot.get_channel(1276087091280871546)
             await api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
+
+async def setup(bot):
+    await bot.add_cog(update(bot))
