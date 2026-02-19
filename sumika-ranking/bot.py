@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 
-
+from log_control import api_worker,db_worker,api_queue,db_queue
 from config import APP_ID, LOG_CHANNEL_ID
 
 from message_count import init_db
