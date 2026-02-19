@@ -18,9 +18,7 @@ class RANK(commands.Bot):
         self.db_queue = asyncio.Queue()
 
     async def setup_hook(self):
-        # --- 拡張 ---
-        if not self.extensions.get("ranking_update"):
-            await self.load_extension("ranking_update")
+
 
 
         # --- APIキュー ---
@@ -33,6 +31,10 @@ class RANK(commands.Bot):
         if not hasattr(self, "_db_worker_started"):
             self.db_worker_task = asyncio.create_task(db_worker())
             self._db_worker_started = True
+
+        # --- 拡張 ---
+        if not self.extensions.get("ranking_update"):
+            await self.load_extension("ranking_update")    
 
     async def on_ready(self):
         if getattr(self, "_initialized", False):
