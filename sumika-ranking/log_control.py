@@ -8,6 +8,7 @@ from config import FOOTER
 import asyncio
 
 
+api_queue = asyncio.Queue()
 
 async def api_worker():
     while True:
@@ -27,7 +28,7 @@ async def api_worker():
         finally:
             api_queue.task_done()
 
-
+db_queue = asyncio.Queue()
 
 
 async def db_worker():
