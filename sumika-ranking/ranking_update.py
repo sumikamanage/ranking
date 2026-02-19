@@ -44,10 +44,10 @@ class update(commands.Cog):
 
           #ランキング処理
         try:
-            await bot.db_queue.put(save_message_to_db(message))
+            await db_queue.put(save_message_to_db(message))
         except Exception as e:
             channel= self.bot.get_channel(1276087091280871546)
-            await bot.api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
+            await api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
 
 async def setup(bot):
     await bot.add_cog(update(bot))
