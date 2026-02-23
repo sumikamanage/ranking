@@ -6,7 +6,7 @@ import os
 import time
 from discord.errors import HTTPException
 import asyncio
-from log_control import api_queue
+from log_control import api_queue,db_queue
 from config import GUILD_ID,LOG_CHANNEL_ID
 import aiosqlite
 
@@ -204,7 +204,7 @@ async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel
             # --- 通常・VCテキストチャンネルの履歴 ---
             if channel.type in (discord.ChannelType.text, discord.ChannelType.voice):
                 async for message in channel.history(limit=limit_per_channel, oldest_first=True):
-                    await api_queue.put(save_message_to_db(message))
+                    await db_queue.put(message)
                     total += 1
                     count += 1
                     if count % 1000 == 0:
@@ -222,7 +222,7 @@ async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel
                         continue
 
                     async for message in thread.history(limit=limit_per_channel, oldest_first=True):
-                        await api_queue.put(save_message_to_db(message))
+                        await db_queue.put(message)
                         total += 1
                         count += 1
                         if count % 300 == 0:
@@ -294,7 +294,7 @@ async def incremental_update(bot: discord.Client, guild: discord.Guild):
             # --- 通常・VCテキストチャンネルの履歴 ---
             if channel.type in (discord.ChannelType.text, discord.ChannelType.voice):
                 async for message in channel.history(limit=limit_per_channel, oldest_first=True):
-                    await api_queue.put(save_message_to_db(message))
+                    await db_queue.put(message)
                     updated_total += 1
                     count += 1
                     if count % 1000 == 0:
@@ -312,7 +312,7 @@ async def incremental_update(bot: discord.Client, guild: discord.Guild):
                         continue
 
                     async for message in thread.history(limit=limit_per_channel, oldest_first=True):
-                        await api_queue.put(save_message_to_db(message))
+                        await db_queue.put(message)
                         updated_total += 1
                         count += 1
                         if count % 300 == 0:
