@@ -8,7 +8,7 @@ from discord.errors import HTTPException
 import asyncio
 from log_control import api_queue
 from config import GUILD_ID,LOG_CHANNEL_ID
-
+import aiosqlite
 
 
 EXCLUDED_CHANNELS = [1399620581766463639]
@@ -92,10 +92,40 @@ def init_db(reset: bool = False):
 
 
 # ===============================
-# 💾 メッセージ保存
+# 💾 メッセージ保存（同期本体）
 # ===============================
+
+def _save_message_to_db_sync(
+    message_id: int,
+    author: str,
+    author_id: int,
+    content: str,
+    channel_id: int,
+    created_at: str,
+):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        INSERT OR IGNORE INTO messages
+        (id, author, author_id, content, channel_id, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        message_id,
+        author,
+        author_id,
+        content,
+        channel_id,
+        created_at
+    ))
+    conn.commit()
+    conn.close()
+
+
+# ===============================
+# 💾 メッセージ保存（非同期ラッパー）
+# ===============================
+
 async def save_message_to_db(message: discord.Message):
-    """メッセージ1件をDBに保存（テキスト/添付/スタンプ いずれかがあればカウント）"""
     try:
         if message.author.bot:
             return
@@ -110,8 +140,7 @@ async def save_message_to_db(message: discord.Message):
         if not (has_content or has_attachments or has_stickers):
             return
 
-
-        # created_at を YYYY-MM-DD HH:MM:SS に正規化（UTC）
+        # JST正規化
         if message.created_at:
             created_at = (
                 message.created_at
@@ -121,22 +150,16 @@ async def save_message_to_db(message: discord.Message):
         else:
             created_at = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
 
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("""
-            INSERT OR IGNORE INTO messages
-            (id, author, author_id, content, channel_id, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (
+        # 🚀 ここが最重要
+        await asyncio.to_thread(
+            _save_message_to_db_sync,
             message.id,
             str(message.author),
             message.author.id,
             message.content or "",
             message.channel.id,
             created_at
-        ))
-        conn.commit()
-        conn.close()
+        )
 
     except Exception as e:
         print(f"❌ save_message_to_db error: {e}")
