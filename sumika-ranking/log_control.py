@@ -19,8 +19,8 @@ async def api_worker():
         except discord.HTTPException as e:
             if e.status == 429:
                 if e.status == 429:
-                print("🚨 429検知（再投入しない）")
-                await asyncio.sleep(10)
+                    print("🚨 429検知（再投入しない）")
+                    await asyncio.sleep(10)
             else:
                 await asyncio.sleep(10)
         finally:
