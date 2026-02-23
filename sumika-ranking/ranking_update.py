@@ -50,5 +50,6 @@ class update(commands.Cog):
             channel= self.bot.get_channel(1276087091280871546)
             await api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
 
+
 async def setup(bot):
     await bot.add_cog(update(bot))
