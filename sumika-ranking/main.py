@@ -42,7 +42,6 @@ print("🔄 サーバーを定義完了")
 
 async def main():
     async with bot:
-        await asyncio.sleep(30)
         await bot.start(TOKEN)
 
         
