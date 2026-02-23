@@ -45,7 +45,7 @@ class update(commands.Cog):
 
           #ランキング処理
         try:
-            await db_queue.put(save_message_to_db(message))
+            await db_queue.put(message)
         except Exception as e:
             channel= self.bot.get_channel(1276087091280871546)
             await api_queue.put(channel.send(f"on_message 保存エラー: {e}"))
