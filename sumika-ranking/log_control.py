@@ -7,7 +7,9 @@ from pathlib import Path
 from config import FOOTER,DB_PATH
 import asyncio
 
-
+import os
+print("RANKING DB PATH:", DB_PATH)
+print("EXISTS:", os.path.exists(DB_PATH))
 # ===============================
 # 💾 メッセージ保存（同期本体）
 # ===============================
