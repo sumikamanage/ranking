@@ -5,6 +5,7 @@ import os
 import time
 from pathlib import Path
 from config import FOOTER 
+from message_count import save_message_to_db
 import asyncio
 
 
