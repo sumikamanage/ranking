@@ -24,6 +24,10 @@ async def first_scan(ctx):
         os.remove(db_path)
         await channel.send("🧹 既存のDB削除完了")
         """
+
+    channel = bot.get_channel(LOG_CHANNEL_ID)
+    guild = bot.get_guild(GUILD_ID)
+    db_path = DB_PATH
     #フルスキャンを開始
     ctx = bot.get_channel(1276087091280871546)
     if message_count.is_updating:
