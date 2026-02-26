@@ -8,37 +8,6 @@ from config import FOOTER
 import asyncio
 
 
-api_queue = asyncio.Queue()
-
-async def api_worker():
-    while True:
-        coro = await api_queue.get()
-        try:
-            await coro
-            await asyncio.sleep(0.9)  # 少し余裕を持たせる
-        except discord.HTTPException as e:
-            if e.status == 429:
-                if e.status == 429:
-                    print("🚨 429検知（再投入しない）")
-                    await asyncio.sleep(10)
-            else:
-                await asyncio.sleep(10)
-        finally:
-            api_queue.task_done()
-
-db_queue = asyncio.Queue()
-
-
-async def db_worker():
-    while True:
-        message = await db_queue.get()
-        try:
-            await save_message_to_db(message)
-        except Exception as e:
-            print(f"DB worker error: {e}")
-        finally:
-            db_queue.task_done()
-
 # ===============================
 # 💾 メッセージ保存（同期本体）
 # ===============================
@@ -111,3 +80,36 @@ async def save_message_to_db(message: discord.Message):
 
     except Exception as e:
         print(f"❌ save_message_to_db error: {e}")
+
+api_queue = asyncio.Queue()
+
+async def api_worker():
+    while True:
+        coro = await api_queue.get()
+        try:
+            await coro
+            await asyncio.sleep(0.9)  # 少し余裕を持たせる
+        except discord.HTTPException as e:
+            if e.status == 429:
+                if e.status == 429:
+                    print("🚨 429検知（再投入しない）")
+                    await asyncio.sleep(10)
+            else:
+                await asyncio.sleep(10)
+        finally:
+            api_queue.task_done()
+
+db_queue = asyncio.Queue()
+
+
+async def db_worker():
+    while True:
+        message = await db_queue.get()
+        try:
+            await save_message_to_db(message)
+        except Exception as e:
+            print(f"DB worker error: {e}")
+        finally:
+            db_queue.task_done()
+
+
