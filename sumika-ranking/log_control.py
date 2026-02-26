@@ -10,6 +10,7 @@ import asyncio
 import os
 print("RANKING DB PATH:", DB_PATH)
 print("EXISTS:", os.path.exists(DB_PATH))
+EXCLUDED_CHANNELS = [1399620581766463639]
 # ===============================
 # 💾 メッセージ保存（同期本体）
 # ===============================
