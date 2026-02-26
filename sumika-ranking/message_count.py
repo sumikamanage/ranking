@@ -7,7 +7,7 @@ import time
 from discord.errors import HTTPException
 import asyncio
 from log_control import api_queue,db_queue
-from config import GUILD_ID,LOG_CHANNEL_ID,DB_PATH
+from config import GUILD_ID,LOG_CHANNEL_ID
 import aiosqlite
 
 
@@ -18,7 +18,9 @@ is_scanning = False
 is_updating = False
 
 
-
+# --- DB_PATH をこのファイルと同じディレクトリに固定 ---
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DB_PATH = os.path.join(BASE_DIR, "messages.db")
 
 #保存時の時刻を日本時間で保存
 JST = timezone(timedelta(hours=9))
