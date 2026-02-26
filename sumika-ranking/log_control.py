@@ -6,8 +6,11 @@ import time
 from pathlib import Path
 from config import FOOTER,DB_PATH
 import asyncio
+import sqlite3
+from datetime import datetime, timezone, timedelta
+from discord.errors import HTTPException
 
-import os
+
 print("RANKING DB PATH:", DB_PATH)
 print("EXISTS:", os.path.exists(DB_PATH))
 EXCLUDED_CHANNELS = [1399620581766463639]
