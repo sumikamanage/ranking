@@ -5,7 +5,7 @@ from discord.ext import commands
 from bot import bot
 import message_count
 from message_count import full_scan, log_worker
-from config import GUILD_ID
+from config import GUILD_ID,DB_PATH
 #カウントコマンド
 from discord.ext import commands
 from collections import Counter
@@ -15,7 +15,7 @@ from collections import Counter
 async def first_scan(ctx):
     # --- DBリセット＆初回スキャン（同期実行） ---
     guild = bot.get_guild(GUILD_ID)
-    db_path = os.path.join(os.path.dirname(__file__), "functions", "messages.db")
+    db_path = DB_PATH
     if os.path.exists(db_path):
         os.remove(db_path)
         await channel.send("🧹 既存のDB削除完了")
