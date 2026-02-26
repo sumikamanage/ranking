@@ -11,14 +11,15 @@ from discord.ext import commands
 from collections import Counter
 
 channel = bot.get_channel(LOG_CHANNEL_ID)
+guild = bot.get_guild(GUILD_ID)
+db_path = DB_PATH
 
 @bot.command("first_scan")
 @commands.has_permissions(administrator=True)
 async def first_scan(ctx):
     """
     # --- DBリセット＆初回スキャン（同期実行） ---
-    guild = bot.get_guild(GUILD_ID)
-    db_path = DB_PATH
+
     if os.path.exists(db_path):
         os.remove(db_path)
         await channel.send("🧹 既存のDB削除完了")
