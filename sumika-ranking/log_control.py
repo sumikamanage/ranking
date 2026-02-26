@@ -4,9 +4,8 @@ from dotenv import load_dotenv
 import os
 import time
 from pathlib import Path
-from config import FOOTER 
+from config import FOOTER,DB_PATH
 import asyncio
-from message_count import DB_PATH
 
 
 # ===============================
