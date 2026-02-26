@@ -5,10 +5,12 @@ from discord.ext import commands
 from bot import bot
 import message_count
 from message_count import full_scan, log_worker
-from config import GUILD_ID,DB_PATH
+from config import GUILD_ID,DB_PATH,LOG_CHANNEL_ID
 #カウントコマンド
 from discord.ext import commands
 from collections import Counter
+
+channel = bot.get_channel(LOG_CHANNEL_ID)
 
 @bot.command("first_scan")
 @commands.has_permissions(administrator=True)
