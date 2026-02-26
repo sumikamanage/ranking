@@ -6,7 +6,7 @@ import os
 import time
 from discord.errors import HTTPException
 import asyncio
-from log_control import api_queue,db_queue
+from log_control import api_queue,db_queue,save_message_to_db
 from config import GUILD_ID,LOG_CHANNEL_ID
 import aiosqlite
 
