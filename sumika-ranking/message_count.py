@@ -10,7 +10,9 @@ from log_control import api_queue,db_queue,save_message_to_db
 from config import GUILD_ID,LOG_CHANNEL_ID,DB_PATH
 import aiosqlite
 
-
+import os
+print("RANKING DB PATH:", DB_PATH)
+print("EXISTS:", os.path.exists(DB_PATH))
 EXCLUDED_CHANNELS = [1399620581766463639]
 
 # 状態フラグ
