@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+from message_count import init_db
 
 from log_control import api_worker,db_worker,api_queue,db_queue
 from config import APP_ID, LOG_CHANNEL_ID
@@ -45,6 +46,7 @@ class RANK(commands.Bot):
         await asyncio.sleep(30)  # ← 重要：Gateway安定待ち
         print("✅ on_ready 開始")
 
+        init_db() 
         channel = self.get_channel(LOG_CHANNEL_ID)
         if channel:
             await channel.send("🔧 初期化開始")
