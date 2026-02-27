@@ -46,11 +46,11 @@ class RANK(commands.Bot):
         await asyncio.sleep(30)  # ← 重要：Gateway安定待ち
         print("✅ on_ready 開始")
 
-        init_db() 
+
         channel = self.get_channel(LOG_CHANNEL_ID)
         if channel:
             await channel.send("🔧 初期化開始")
-
+        init_db() 
 
         if channel:
             await channel.send(f"🎉 {self.user} 起動完了")
