@@ -87,6 +87,7 @@ def init_db(reset: bool = False):
     conn.commit()
     conn.close()
     print("✅ messages.db 初期化完了")
+    print(DB_PATH)
 
 
 
