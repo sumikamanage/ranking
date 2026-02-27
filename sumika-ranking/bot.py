@@ -4,7 +4,7 @@ import asyncio
 from message_count import init_db
 
 from log_control import api_worker,db_worker,api_queue,db_queue
-from config import APP_ID, LOG_CHANNEL_ID
+from config import APP_ID, LOG_CHANNEL_ID,DB_PATH,GUILD_ID
 
 from message_count import init_db
 # Bot設定
@@ -51,7 +51,16 @@ class RANK(commands.Bot):
         if channel:
             await channel.send("🔧 初期化開始")
         init_db() 
-
+        guild = bot.get_guild(GUILD_ID)
+        db_path = DB_PATH
+        #フルスキャンを開始
+        ctx = bot.get_channel(1276087091280871546)
+        if message_count.is_updating:
+            return 
+        if message_count.is_scanning:
+            return 
+        asyncio.create_task(full_scan(bot,guild))
+        
         if channel:
             await channel.send(f"🎉 {self.user} 起動完了")
 
