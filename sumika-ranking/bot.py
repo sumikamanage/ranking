@@ -36,6 +36,7 @@ class RANK(commands.Bot):
         if not self.extensions.get("ranking_update"):
             await self.load_extension("ranking_update")
 
+        await bot.tree.sync()
     async def on_ready(self):
         if getattr(self, "_initialized", False):
             return
@@ -49,7 +50,6 @@ class RANK(commands.Bot):
         channel = self.get_channel(LOG_CHANNEL_ID)
         if channel:
             await channel.send("🔧 初期化開始")
-        await bot.tree.sync()
 #        init_db() 
         guild = bot.get_guild(GUILD_ID)
         db_path = DB_PATH
