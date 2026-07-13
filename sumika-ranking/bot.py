@@ -66,6 +66,6 @@ class RANK(commands.Bot):
  
 
 #コマンド実行時のキーの決定
-#bot = RANK(command_prefix="/", intents=intents,application_id = APP_ID)
+bot = RANK(intents=intents,application_id = APP_ID)
 #helpコマンド独自実装のため規定コマンドを削除
 bot.remove_command("help")
