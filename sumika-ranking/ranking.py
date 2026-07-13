@@ -53,7 +53,7 @@ async def _send_ranking(
 # メッセージ数ランキング
 # ranking [開始順位] [表示数]
 # ===============================
-@bot.command(name="ranking")
+@bot.tree.command(name="ranking")
 async def ranking(
     ctx,
     start: int = 1,
@@ -87,7 +87,7 @@ async def ranking(
 #
 # ranking_period 2026-01-01 2026-01-31
 # ===============================
-@bot.command(name="ranking_period")
+@bot.tree.command(name="ranking_period")
 async def ranking_period(
     ctx,
     start_date: str,
@@ -116,7 +116,7 @@ async def ranking_period(
 # ===============================
 # 文字数ランキング
 # ===============================
-@bot.command(name="ranking_length")
+@bot.tree.command(name="ranking_length")
 async def ranking_length(
     ctx,
     start: int = 1,
@@ -148,7 +148,7 @@ async def ranking_length(
 #
 # ranking_length_period
 # ===============================
-@bot.command(name="ranking_length_period")
+@bot.tree.command(name="ranking_length_period")
 async def ranking_length_period(
     ctx,
     start_date: str,
@@ -178,7 +178,7 @@ async def ranking_length_period(
 # ===============================
 # 個人ランキング（メッセージ数）
 # ===============================
-@bot.command(name="myrank")
+@bot.tree.command(name="myrank")
 async def myrank(
     ctx,
     member: discord.Member = None,
@@ -200,7 +200,7 @@ async def myrank(
 # 例
 # &myrank_period 2026-06-01 2026-06-30
 # ===============================
-@bot.command(name="myrank_period")
+@bot.tree.command(name="myrank_period")
 async def myrank_period(
     ctx,
     start_date: str,
@@ -225,7 +225,7 @@ async def myrank_period(
 # ===============================
 # 個人文字数ランキング
 # ===============================
-@bot.command(name="myrank_length")
+@bot.tree.command(name="myrank_length")
 async def myrank_length(
     ctx,
     member: discord.Member = None,
@@ -247,7 +247,7 @@ async def myrank_length(
 # 例
 # &myrank_length_period 2026-06-01 2026-06-30
 # ===============================
-@bot.command(name="myrank_length_period")
+@bot.tree.command(name="myrank_length_period")
 async def myrank_length_period(
     ctx,
     start_date: str,
