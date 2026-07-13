@@ -1,6 +1,7 @@
 import discord
 import asyncio
 from discord.ext import commands
+from discord import app_commands
 
 from datetime import datetime
 
@@ -21,7 +22,7 @@ footer=FOOTER
 # ===============================
 
 async def _send_ranking(
-    ctx,
+    interaction,
     rows,
     start,
     title,
@@ -29,7 +30,7 @@ async def _send_ranking(
     color=discord.Color.blue(),
 ):
     if not rows:
-        return await ctx.send("ランキングが見つかりませんでした。")
+        return await interaction.response.send_message("ランキングが見つかりませんでした。")
 
     lines = []
 
@@ -46,7 +47,7 @@ async def _send_ranking(
 
     embed.set_footer(text=footer)
 
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 
 # ===============================
@@ -55,16 +56,16 @@ async def _send_ranking(
 # ===============================
 @bot.tree.command(name="ranking")
 async def ranking(
-    ctx,
+    interaction: discord.Interaction,
     start: int = 1,
     length: int = 10,
 ):
 
     if start < 1:
-        return await ctx.send("開始順位は1以上です。")
+        return await interaction.response.send_message("開始順位は1以上です。")
 
     if length < 1:
-        return await ctx.send("表示件数は1以上です。")
+        return await interaction.response.send_message("表示件数は1以上です。")
 
     length = min(length, 200)
 
@@ -74,7 +75,7 @@ async def ranking(
     )
 
     await _send_ranking(
-        ctx,
+        interaction,
         rows,
         start,
         f"📈 メッセージ数ランキング ({start}位～)",
@@ -89,7 +90,7 @@ async def ranking(
 # ===============================
 @bot.tree.command(name="ranking_period")
 async def ranking_period(
-    ctx,
+    interaction: discord.Interaction,
     start_date: str,
     end_date: str,
     start: int = 1,
@@ -104,7 +105,7 @@ async def ranking_period(
     )
 
     await _send_ranking(
-        ctx,
+        interaction,
         rows,
         start,
         f"📈 メッセージ数ランキング\n({start_date} ～ {end_date})",
@@ -118,16 +119,16 @@ async def ranking_period(
 # ===============================
 @bot.tree.command(name="ranking_length")
 async def ranking_length(
-    ctx,
+    interaction: discord.Interaction,
     start: int = 1,
     length: int = 10,
 ):
 
     if start < 1:
-        return await ctx.send("開始順位は1以上です。")
+        return await interaction.response.send_message("開始順位は1以上です。")
 
     if length < 1:
-        return await ctx.send("表示件数は1以上です。")
+        return await interaction.response.send_message("表示件数は1以上です。")
 
     rows = get_message_length_ranking_slice(
         offset=start - 1,
@@ -135,7 +136,7 @@ async def ranking_length(
     )
 
     await _send_ranking(
-        ctx,
+        interaction,
         rows,
         start,
         f"📝 文字数ランキング ({start}位～)",
@@ -150,7 +151,7 @@ async def ranking_length(
 # ===============================
 @bot.tree.command(name="ranking_length_period")
 async def ranking_length_period(
-    ctx,
+    interaction: discord.Interaction,
     start_date: str,
     end_date: str,
     start: int = 1,
@@ -165,7 +166,7 @@ async def ranking_length_period(
     )
 
     await _send_ranking(
-        ctx,
+        interaction,
         rows,
         start,
         f"📝 文字数ランキング\n({start_date} ～ {end_date})",
@@ -180,7 +181,7 @@ async def ranking_length_period(
 # ===============================
 @bot.tree.command(name="myrank")
 async def myrank(
-    ctx,
+    interaction: discord.Interaction,
     member: discord.Member = None,
 ):
     target = member or ctx.author
@@ -191,7 +192,7 @@ async def myrank(
 
     embed.set_footer(text=footer)
 
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 
 # ===============================
@@ -202,7 +203,7 @@ async def myrank(
 # ===============================
 @bot.tree.command(name="myrank_period")
 async def myrank_period(
-    ctx,
+    interaction: discord.Interaction,
     start_date: str,
     end_date: str,
     member: discord.Member = None,
@@ -219,7 +220,7 @@ async def myrank_period(
         text=f"{footer} | {start_date} ～ {end_date}"
     )
 
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 
 # ===============================
@@ -227,7 +228,7 @@ async def myrank_period(
 # ===============================
 @bot.tree.command(name="myrank_length")
 async def myrank_length(
-    ctx,
+    interaction: discord.Interaction,
     member: discord.Member = None,
 ):
     target = member or ctx.author
@@ -238,7 +239,7 @@ async def myrank_length(
 
     embed.set_footer(text=footer)
 
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 
 # ===============================
@@ -249,7 +250,7 @@ async def myrank_length(
 # ===============================
 @bot.tree.command(name="myrank_length_period")
 async def myrank_length_period(
-    ctx,
+    interaction: discord.Interaction,
     start_date: str,
     end_date: str,
     member: discord.Member = None,
@@ -266,5 +267,5 @@ async def myrank_length_period(
         text=f"{footer} | {start_date} ～ {end_date}"
     )
 
-    await ctx.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
