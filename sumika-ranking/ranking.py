@@ -184,7 +184,7 @@ async def myrank(
     interaction: discord.Interaction,
     member: discord.Member = None,
 ):
-    target = member or ctx.author
+    target = member or interaction.user
 
     embed = await create_member_rank_embed(
         target,
@@ -208,7 +208,7 @@ async def myrank_period(
     end_date: str,
     member: discord.Member = None,
 ):
-    target = member or ctx.author
+    target = member or interaction.user
 
     embed = await create_member_rank_embed(
         target,
@@ -231,7 +231,7 @@ async def myrank_length(
     interaction: discord.Interaction,
     member: discord.Member = None,
 ):
-    target = member or ctx.author
+    target = member or interaction.user
 
     embed = await create_member_length_rank_embed(
         target,
@@ -255,7 +255,7 @@ async def myrank_length_period(
     end_date: str,
     member: discord.Member = None,
 ):
-    target = member or ctx.author
+    target = member or interaction.user
 
     embed = await create_member_length_rank_embed(
         target,
@@ -269,3 +269,5 @@ async def myrank_length_period(
 
     await interaction.response.send_message(embed=embed)
 
+
+print("✅ ranking.py loaded")
