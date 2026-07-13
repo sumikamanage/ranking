@@ -6,7 +6,7 @@ import os
 import time
 from discord.errors import HTTPException
 import asyncio
-from log_control import api_queue,db_queue,save_message_to_db
+from log_control import api_queue,db_queue,save_message_to_db,history_worker,api_call,fetch_history,fetch_archived_threads
 from config import GUILD_ID,LOG_CHANNEL_ID,DB_PATH
 import aiosqlite
 
@@ -148,26 +148,38 @@ async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel
                                 bot,
                                 f"📊 {channel.name}: {count} 件読み込み済み"
                             )
+                            
+                        if count % 5000 == 0:
+                            await bot.db_queue.join()
 
                 # -------------------------------
                 # フォーラム
                 # -------------------------------
                 elif channel.type == discord.ChannelType.forum:
 
-                    threads = list(channel.threads)
-                    threads.extend(
-                        await fetch_archived_threads(bot, channel)
-                    )
+                    threads = {
+                        thread.id: thread
+                        for thread in channel.threads
+                    }
+
+                    for thread in await fetch_archived_threads(bot, channel):
+                        threads.setdefault(thread.id, thread)
+
+                    threads = list(threads.values())
 
                     for thread in threads:
 
                         if not thread.permissions_for(me).read_message_history:
                             continue
 
-                        async for message in thread.history(
-                            limit=limit_per_channel,
-                            oldest_first=True
-                        ):
+                        messages = await fetch_history(
+                            bot,
+                            thread,
+                            limit_per_channel,
+                            True
+                        )
+
+                        for message in messages:
                             await bot.db_queue.put(message)
 
                             total += 1
@@ -178,6 +190,9 @@ async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel
                                     bot,
                                     f"🧵 {thread.name}: {count} 件読み込み済み"
                                 )
+
+                            if count % 5000 == 0:
+                                await bot.db_queue.join()
 
                 await send_log(
                     bot,
