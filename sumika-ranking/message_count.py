@@ -28,41 +28,28 @@ JST = timezone(timedelta(hours=9))
 # 🔧 ログ送信関数
 # ===============================
 
-log_queue = asyncio.Queue()
-async def queue_send_log(bot, message: str = None, embed=None):
-    await log_queue.put((message, embed))
-
-async def log_worker(bot, channel_id: int):
-    await bot.wait_until_ready()  # Bot が完全に起動するまで待つ
-
-    channel = bot.get_channel(channel_id)
-
-    # もし None ならリトライする（起動直後に None になる場合がある）
-    while channel is None:
-        print("ログチャンネル取得できず、再試行中…")
-        await asyncio.sleep(1)
-        channel = bot.get_channel(channel_id)
-
-    print(f"ログチャンネル取得成功: {channel.name}")
-
-    buffer = []
     
 async def send_log(bot: discord.Client, text: str):
-    """指定チャンネルにDiscordログを送信（チャンネル未設定時はprint）"""
+    """指定チャンネルにログを送信"""
+
     if LOG_CHANNEL_ID == 0:
         print(f"[LOG] {text}")
         return
 
     try:
         channel = bot.get_channel(LOG_CHANNEL_ID)
+
         if channel is None:
             print(f"[WARN] ログチャンネルが見つかりません: {LOG_CHANNEL_ID}")
             return
-        await api_queue.put(channel.send(f"🪵 {text}"))
+
+        await bot.api_queue.put(
+            channel.send(f"🪵 {text}")
+        )
+
     except Exception as e:
         print(f"[ERR] send_log失敗: {e}")
-
-
+        
 # ===============================
 # 🧱 DB 初期化
 # ===============================
@@ -91,87 +78,135 @@ def init_db(reset: bool = False):
 
 
 
-
 # ===============================
 # 🧹 初回フルスキャン（スレッド限定チャンネル対応）
 # ===============================
 async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel: int | None = None):
     global is_scanning
+
     if is_scanning:
         await send_log(bot, "⚠️ フルスキャンはすでに実行中です。")
         return
+
     is_scanning = True
-    init_db()
-    total = 0
-    await send_log(bot, "📥 全メッセージスキャン開始")
 
-    # --- 全チャンネルを対象（テキスト・フォーラム・ボイス） ---
-    EXCLUDED_CHANNEL_IDS = {
-    1276087091280871546,
-    1399620581766463639,
-    }
-    all_channels = [
-        ch for ch in guild.channels
-        if ch.type in (
-            discord.ChannelType.text,
-            discord.ChannelType.forum,
-            discord.ChannelType.voice,
-        )
-        and ch.id not in EXCLUDED_CHANNEL_IDS
-    ]
+    try:
+        init_db()
+        total = 0
 
-    channel = None 
-    for channel in all_channels:
-        try:
-            await send_log(bot, f"📊 {channel.name}: 読み込み開始")
-            count = 0
-            # チャンネル読み取り権限チェック
-            if not channel.permissions_for(guild.me).read_message_history:
-                continue
+        await send_log(bot, "📥 全メッセージスキャン開始")
 
-            # --- 通常・VCテキストチャンネルの履歴 ---
-            if channel.type in (discord.ChannelType.text, discord.ChannelType.voice):
-                async for message in channel.history(limit=limit_per_channel, oldest_first=True):
-                    await db_queue.put(message)
-                    total += 1
-                    count += 1
-                    if count % 1000 == 0:
-                        await send_log(bot, f"📊 {channel.name}: {count} 件読み込み済み")
-                    await asyncio.sleep(0.5)
+        EXCLUDED_CHANNEL_IDS = {
+            1276087091280871546,
+            1399620581766463639,
+        }
 
-            # --- フォーラムチャンネル（投稿はすべてスレッド扱い） ---
-            elif channel.type == discord.ChannelType.forum:
-                threads = list(channel.threads)
-                async for archived in channel.archived_threads(limit=None):
-                    threads.append(archived)
+        all_channels = [
+            ch for ch in guild.channels
+            if ch.type in (
+                discord.ChannelType.text,
+                discord.ChannelType.forum,
+                discord.ChannelType.voice,
+            )
+            and ch.id not in EXCLUDED_CHANNEL_IDS
+        ]
 
-                for thread in threads:
-                    if not thread.permissions_for(guild.me).read_message_history:
-                        continue
+        me = guild.me or guild.get_member(bot.user.id)
 
-                    async for message in thread.history(limit=limit_per_channel, oldest_first=True):
-                        await db_queue.put(message)
+        for channel in all_channels:
+            try:
+                await send_log(bot, f"📊 {channel.name}: 読み込み開始")
+
+                count = 0
+
+                if not channel.permissions_for(me).read_message_history:
+                    continue
+
+                # -------------------------------
+                # 通常チャンネル
+                # -------------------------------
+                if channel.type in (
+                    discord.ChannelType.text,
+                    discord.ChannelType.voice,
+                ):
+
+                    async for message in channel.history(
+                        limit=limit_per_channel,
+                        oldest_first=True
+                    ):
+                        await bot.db_queue.put(message)
+
                         total += 1
                         count += 1
-                        if count % 300 == 0:
-                            await send_log(bot, f"🧵 {thread.name}: {count} 件読み込み済み")
-                        await asyncio.sleep(0.5)
-                        
-            await send_log(bot, f"📊 {channel.name}: {total} 件読み込み済み")
-            
-        except discord.errors.HTTPException as e:
-            if e.status == 429:
-                retry_after = getattr(e, "retry_after", 30)
-                await send_log(bot, f"⏳ レート制限: {retry_after:.1f}秒待機")
-                await asyncio.sleep(retry_after)
-        except Exception as e:
-            await send_log(bot, f"⚠️ {channel.name} の処理中にエラー: {e}")
 
-        await asyncio.sleep(0.6)
-    
-    await send_log(bot, f"🎉 初回スキャン完了！合計 {total} 件保存")
-    is_scanning = False
+                        if count % 1000 == 0:
+                            await send_log(
+                                bot,
+                                f"📊 {channel.name}: {count} 件読み込み済み"
+                            )
 
+                # -------------------------------
+                # フォーラム
+                # -------------------------------
+                elif channel.type == discord.ChannelType.forum:
+
+                    threads = list(channel.threads)
+
+                    async for archived in channel.archived_threads(limit=None):
+                        threads.append(archived)
+
+                    for thread in threads:
+
+                        if not thread.permissions_for(me).read_message_history:
+                            continue
+
+                        async for message in thread.history(
+                            limit=limit_per_channel,
+                            oldest_first=True
+                        ):
+                            await bot.db_queue.put(message)
+
+                            total += 1
+                            count += 1
+
+                            if count % 300 == 0:
+                                await send_log(
+                                    bot,
+                                    f"🧵 {thread.name}: {count} 件読み込み済み"
+                                )
+
+                await send_log(
+                    bot,
+                    f"📊 {channel.name}: {count} 件読み込み完了"
+                )
+
+            except discord.HTTPException as e:
+
+                if e.status == 429:
+                    retry_after = getattr(e, "retry_after", 30)
+
+                    await send_log(
+                        bot,
+                        f"⏳ レート制限: {retry_after:.1f}秒待機"
+                    )
+
+                    await asyncio.sleep(retry_after)
+
+            except Exception as e:
+                await send_log(
+                    bot,
+                    f"⚠️ {channel.name} の処理中にエラー: {e}"
+                )
+
+            await asyncio.sleep(0.3)
+
+        await send_log(
+            bot,
+            f"🎉 初回スキャン完了！合計 {total} 件保存"
+        )
+
+    finally:
+        is_scanning = False
 
 # ===============================
 # 🔄 増分更新（スレッド限定チャンネル対応）
