@@ -136,6 +136,33 @@ async def db_worker(bot):
         finally:
             bot.db_queue.task_done()
 
+
+async def history_worker(bot):
+    while True:
+        func, future = await bot.history_queue.get()
+        
+        try:
+            result = await func()
+            future.set_result(result)
+            
+        except discord.HTTPException as e:
+            if e.status == 429:
+                retry = getattr(e, "retry_after", 10)
+                print(f"429(HISTORY) {retry:.2f}s")
+                await asyncio.sleep(retry)
+                future.set_exception(e)
+            else:
+                future.set_exception(e)
+                
+        except Exception as e:
+            future.set_exception(e)
+            
+        finally:
+            bot.history_queue.task_done()
+            await asyncio.sleep(0.25)
+
+
+
 async def api_call(bot, func):
     """
     Discord APIをapi_queue経由で実行する
@@ -155,22 +182,38 @@ async def api_call(bot, func):
     return await future
 
 
-async def fetch_history(bot, channel, limit=None, oldest_first=True):
+async def fetch_history(
+    bot,
+    channel,
+    limit=None,
+    oldest_first=True,
+):
+    future = asyncio.get_running_loop().create_future()
     async def runner():
         return [
-            message async for message in channel.history(
+            message
+            async for message in channel.history(
                 limit=limit,
-                oldest_first=oldest_first
+                oldest_first=oldest_first,
             )
         ]
 
-    return await api_call(bot, runner)
+    await bot.history_queue.put(
+        (runner, future)
+    )
+
+    return await future
 
 
 async def fetch_archived_threads(bot, forum):
+    future = asyncio.get_running_loop().create_future()
     async def runner():
         return [
-            thread async for thread in forum.archived_threads(limit=None)
+            thread
+            async for thread in forum.archived_threads(limit=None)
         ]
 
-    return await api_call(bot, runner)
+    await bot.history_queue.put(
+        (runner, future)
+    )
+    return await future
