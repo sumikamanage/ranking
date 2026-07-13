@@ -6,7 +6,7 @@ import os
 import time
 from discord.errors import HTTPException
 import asyncio
-from log_control import api_queue,db_queue,save_message_to_db,history_worker,api_call,fetch_history,fetch_archived_threads
+from log_control import save_message_to_db,history_worker,api_call,fetch_history,fetch_archived_threads
 from config import GUILD_ID,LOG_CHANNEL_ID,DB_PATH
 import aiosqlite
 
