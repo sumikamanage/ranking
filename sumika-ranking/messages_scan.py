@@ -53,10 +53,6 @@ async def first_scan(ctx):
 @bot.command(name="stop_scan")
 @commands.has_permissions(administrator=True)
 async def stop_scan(ctx):
-    """
-    実行中のフルスキャンを停止
-    """
-
     global scan_task
 
     if scan_task is None:
@@ -70,6 +66,10 @@ async def stop_scan(ctx):
             "⚠️ スキャンはすでに終了しています。"
         )
 
+    await ctx.send(
+        "🛑 フルスキャン停止要求を送信しました..."
+    )
+
     scan_task.cancel()
 
     try:
@@ -78,10 +78,11 @@ async def stop_scan(ctx):
     except asyncio.CancelledError:
         pass
 
-    scan_task = None
+    finally:
+        scan_task = None
 
     await ctx.send(
-        "🛑 フルスキャンを停止しました。"
+        "✅ フルスキャンを停止しました。"
     )
 
 
