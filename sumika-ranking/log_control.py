@@ -87,35 +87,52 @@ async def save_message_to_db(message: discord.Message):
     except Exception as e:
         print(f"❌ save_message_to_db error: {e}")
 
-api_queue = asyncio.Queue()
 
-async def api_worker():
+async def api_worker(bot):
     while True:
-        coro = await api_queue.get()
+        coro = await bot.api_queue.get()
+
         try:
             await coro
-            await asyncio.sleep(0.9)  # 少し余裕を持たせる
+
         except discord.HTTPException as e:
+
             if e.status == 429:
-                if e.status == 429:
-                    print("🚨 429検知（再投入しない）")
-                    await asyncio.sleep(10)
+
+                retry = getattr(e, "retry_after", 10)
+
+                print(f"🚨 429検知 {retry:.2f}秒待機")
+
+                await asyncio.sleep(retry)
+
             else:
-                await asyncio.sleep(10)
-        finally:
-            api_queue.task_done()
+                print(e)
+                await asyncio.sleep(5)
 
-db_queue = asyncio.Queue()
-
-
-async def db_worker():
-    while True:
-        message = await db_queue.get()
-        try:
-            await save_message_to_db(message)
         except Exception as e:
-            print(f"DB worker error: {e}")
-        finally:
-            db_queue.task_done()
+            print("API Worker Error:", e)
 
+        finally:
+
+            bot.api_queue.task_done()
+
+            # Discordへ少し余裕を与える
+            await asyncio.sleep(0.3)
+
+
+async def db_worker(bot):
+
+    while True:
+
+        message = await bot.db_queue.get()
+
+        try:
+
+            await save_message_to_db(message)
+
+        except Exception as e:
+            print("DB Worker Error:", e)
+
+        finally:
+            bot.db_queue.task_done()
 
