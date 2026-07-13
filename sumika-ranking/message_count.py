@@ -130,10 +130,14 @@ async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel
                     discord.ChannelType.voice,
                 ):
 
-                    async for message in channel.history(
-                        limit=limit_per_channel,
-                        oldest_first=True
-                    ):
+                    messages = await fetch_history(
+                        bot,
+                        channel,
+                        limit_per_channel,
+                        True
+                    )
+
+                    for message in messages:
                         await bot.db_queue.put(message)
 
                         total += 1
@@ -151,9 +155,9 @@ async def full_scan(bot: discord.Client, guild: discord.Guild, limit_per_channel
                 elif channel.type == discord.ChannelType.forum:
 
                     threads = list(channel.threads)
-
-                    async for archived in channel.archived_threads(limit=None):
-                        threads.append(archived)
+                    threads.extend(
+                        await fetch_archived_threads(bot, channel)
+                    )
 
                     for thread in threads:
 
