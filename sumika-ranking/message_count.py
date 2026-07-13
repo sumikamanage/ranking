@@ -384,6 +384,13 @@ async def incremental_update(bot: discord.Client, guild: discord.Guild):
     finally:
         is_updating = False
 
+        # キャンセル時のログ
+        if asyncio.current_task().cancelled():
+            await send_log(
+                bot,
+                "🛑 フルスキャンが停止されました。"
+            )
+
 # ===============================
 # 📊 ランキング取得共通
 # ===============================
