@@ -1,59 +1,65 @@
-import discord
 import asyncio
 import os
+
 from discord.ext import commands
+
 from bot import bot
 import message_count
-from message_count import full_scan, log_worker,DB_PATH
-from config import GUILD_ID,LOG_CHANNEL_ID
-#カウントコマンド
-from discord.ext import commands
-from collections import Counter
+from message_count import full_scan, DB_PATH
+from config import GUILD_ID
 
-channel = bot.get_channel(LOG_CHANNEL_ID)
-guild = bot.get_guild(GUILD_ID)
-db_path = DB_PATH
 
-@bot.command("first_scan")
+# ===============================
+# 初回フルスキャン
+# ===============================
+@bot.command(name="first_scan")
 @commands.has_permissions(administrator=True)
 async def first_scan(ctx):
     """
-    # --- DBリセット＆初回スキャン（同期実行） ---
+    DBを初期化してサーバー全体をスキャン
+    """
 
-    if os.path.exists(db_path):
-        os.remove(db_path)
-        await channel.send("🧹 既存のDB削除完了")
-        """
-
-    channel = bot.get_channel(LOG_CHANNEL_ID)
     guild = bot.get_guild(GUILD_ID)
-    db_path = DB_PATH
-    #フルスキャンを開始
-    ctx = bot.get_channel(1276087091280871546)
+
+    if guild is None:
+        return await ctx.send("❌ サーバーが取得できませんでした。")
+
     if message_count.is_updating:
-        return await ctx.send("⚠️ 現在、更新処理が実行中です。スキャンできません。")
+        return await ctx.send("⚠️ 現在、更新処理が実行中です。")
+
     if message_count.is_scanning:
         return await ctx.send("⚠️ すでにスキャン実行中です。")
+
     await ctx.send("🔍 サーバー全体のスキャンを開始します…")
-    asyncio.create_task(full_scan(bot,guild))
+
+    asyncio.create_task(
+        full_scan(bot, guild)
+    )
 
 
-    #asyncio.create_task(log_worker(bot, 1276087091280871546))
-
-
-
-# ---- アップデートメッセージカウント ----
+# ===============================
+# 増分更新
+# ===============================
 @bot.command(name="update_messages")
 @commands.has_permissions(administrator=True)
 async def update_messages(ctx):
-    guild = bot.get_guild(GUILD_ID)
-    channel = bot.get_channel(1276087091280871546)
 
-    """増分更新を開始"""
+    guild = bot.get_guild(GUILD_ID)
+
+    if guild is None:
+        return await ctx.send("❌ サーバーが取得できませんでした。")
+
     if message_count.is_scanning:
         return await ctx.send("⚠️ 現在スキャン中のため更新できません。")
+
     if message_count.is_updating:
         return await ctx.send("⚠️ すでに更新処理が実行中です。")
+
     await ctx.send("🔄 メッセージの増分更新を開始します…")
-    asyncio.create_task(message_count.incremental_update(bot,guild))
-    await ctx.send("✅メッセージの増分更新が完了しました！")
+
+    asyncio.create_task(
+        message_count.incremental_update(
+            bot,
+            guild
+        )
+    )
