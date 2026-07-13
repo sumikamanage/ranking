@@ -10,6 +10,7 @@ import sqlite3
 from datetime import datetime, timezone, timedelta
 from discord.errors import HTTPException
 
+JST = timezone(timedelta(hours=9))
 
 print("RANKING DB PATH:", DB_PATH)
 print("EXISTS:", os.path.exists(DB_PATH))
