@@ -3,7 +3,7 @@ from discord.ext import commands
 import asyncio
 from message_count import init_db
 
-from log_control import api_worker,db_worker,api_queue,db_queue
+from log_control import api_worker,db_worker
 from config import APP_ID, LOG_CHANNEL_ID,DB_PATH,GUILD_ID
 
 from message_count import init_db
