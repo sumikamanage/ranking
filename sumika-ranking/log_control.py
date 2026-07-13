@@ -136,3 +136,20 @@ async def db_worker(bot):
         finally:
             bot.db_queue.task_done()
 
+async def api_call(bot, func):
+    """
+    Discord APIをapi_queue経由で実行する
+    戻り値が必要なAPIにも対応
+    """
+    future = asyncio.get_running_loop().create_future()
+
+    async def runner():
+        try:
+            result = await func()
+            future.set_result(result)
+        except Exception as e:
+            future.set_exception(e)
+
+    await bot.api_queue.put(runner())
+
+    return await future
