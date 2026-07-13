@@ -609,7 +609,7 @@ async def create_member_rank_embed(
         start_text = start_date if start_date else "最初"
         end_text = end_date if end_date else "現在"
 
-            title = (
+        title = (
             f"📊 {member.display_name} のメッセージランキング\n"
             f"{start_text} ～ {end_text}"
         )
@@ -658,7 +658,7 @@ async def create_member_length_rank_embed(
         start_text = start_date if start_date else "最初"
         end_text = end_date if end_date else "現在"
 
-            title = (
+        title = (
             f"📊 {member.display_name} の文字数ランキング\n"
             f"{start_text} ～ {end_text}"
         )
