@@ -12,7 +12,7 @@ from config import GUILD_ID
 # ===============================
 # 初回フルスキャン
 # ===============================
-@bot.command(name="first_scan")
+@bot.tree.command(name="first_scan")
 @commands.has_permissions(administrator=True)
 async def first_scan(ctx):
     """
@@ -40,7 +40,7 @@ async def first_scan(ctx):
 # ===============================
 # 増分更新
 # ===============================
-@bot.command(name="update_messages")
+@bot.tree.command(name="update_messages")
 @commands.has_permissions(administrator=True)
 async def update_messages(ctx):
 
