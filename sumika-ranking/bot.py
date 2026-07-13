@@ -49,7 +49,7 @@ class RANK(commands.Bot):
         channel = self.get_channel(LOG_CHANNEL_ID)
         if channel:
             await channel.send("🔧 初期化開始")
-        init_db() 
+#        init_db() 
         guild = bot.get_guild(GUILD_ID)
         db_path = DB_PATH
         #フルスキャンを開始
