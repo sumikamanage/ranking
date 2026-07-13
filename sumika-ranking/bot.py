@@ -1,12 +1,10 @@
 import discord
 from discord.ext import commands
 import asyncio
-from message_count import init_db
-
+from message_count import full_scan
 from log_control import api_worker,db_worker,history_worker
 from config import APP_ID, LOG_CHANNEL_ID,DB_PATH,GUILD_ID
 
-from message_count import init_db
 import message_count
 # Bot設定
 intents = discord.Intents.all()
