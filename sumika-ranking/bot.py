@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-from message_count import full_scan
+from message_count import full_scan,init_db
 from log_control import api_worker,db_worker,history_worker
 from config import APP_ID, LOG_CHANNEL_ID,DB_PATH,GUILD_ID
 
