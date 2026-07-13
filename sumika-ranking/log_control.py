@@ -153,3 +153,24 @@ async def api_call(bot, func):
     await bot.api_queue.put(runner())
 
     return await future
+
+
+async def fetch_history(bot, channel, limit=None, oldest_first=True):
+    async def runner():
+        return [
+            message async for message in channel.history(
+                limit=limit,
+                oldest_first=oldest_first
+            )
+        ]
+
+    return await api_call(bot, runner)
+
+
+async def fetch_archived_threads(bot, forum):
+    async def runner():
+        return [
+            thread async for thread in forum.archived_threads(limit=None)
+        ]
+
+    return await api_call(bot, runner)
