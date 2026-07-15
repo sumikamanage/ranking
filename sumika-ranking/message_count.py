@@ -616,12 +616,12 @@ async def create_member_rank_embed(
     if start_date is "None" and end_date is "None":
         title = f"📊 {member.display_name} のメッセージランキング"
     else:
-        if start_date=None:
+        if start_date==None:
             start_text = "最初"
         else:
             start_text=start_date
 
-        if end_date = None:
+        if end_date == None:
             end_text = "現在"
         else:
             end_text = end_date
@@ -672,12 +672,12 @@ async def create_member_length_rank_embed(
     if start_date is "None" and end_date is "None":
         title = f"📊 {member.display_name} の文字数ランキング"
     else:
-        if start_date=None:
+        if start_date == None:
             start_text = "最初"
         else:
             start_text=start_date
 
-        if end_date = None:
+        if end_date == None:
             end_text = "現在"
         else:
             end_text = end_date
