@@ -28,7 +28,7 @@ class Update(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-
+        print(f"🔴on_message発火: {message.author} : {message.content}")
         # Bot・DMは無視
         if message.author.bot or message.guild is None:
             return
@@ -49,6 +49,7 @@ class Update(commands.Cog):
             return
 
         try:
+            print("DB Queueに追加")
             await self.bot.db_queue.put(message)
 
         except Exception as e:
