@@ -435,6 +435,7 @@ def get_message_ranking_slice(
 
     where, params = _make_date_where(start_date,end_date,)
 
+    print("READ DB:", DB_PATH)
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
