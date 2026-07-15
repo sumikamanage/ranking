@@ -35,6 +35,7 @@ class RANK(commands.Bot):
         
         if not self.extensions.get("ranking_update"):
             await self.load_extension("ranking_update")
+            print("ranking_update loaded")
 
         await bot.tree.sync()
     async def on_ready(self):
