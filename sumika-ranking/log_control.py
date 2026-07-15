@@ -126,10 +126,12 @@ async def db_worker(bot):
     while True:
 
         message = await bot.db_queue.get()
+        print("DB Worker:", message.id)
 
         try:
 
             await save_message_to_db(message)
+            print("SAVE:", message.id)
 
         except Exception as e:
             print("DB Worker Error:", e)
