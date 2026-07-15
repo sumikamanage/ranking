@@ -108,10 +108,10 @@ async def ranking_period(
         end_date=end_date,
     )
 
-    if start_date = "None":
+    if start_date == "None":
         start_date = "最初"
 
-    if end_date = "None":
+    if end_date == "None":
         end_date = "現在"
         
     await _send_ranking(
