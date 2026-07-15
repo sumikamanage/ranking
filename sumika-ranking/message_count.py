@@ -430,6 +430,20 @@ def get_message_ranking_slice(
     start_date=None,
     end_date=None,
 ):
+
+    if start_date is "None" and end_date is "None":
+        start_date = None
+        end_date = None
+    else:
+        if start_date=None:
+            start_text = "最初"
+        else:
+            start_text=start_date
+
+        if end_date = None:
+            end_text = "現在"
+        else:
+            end_text = end_date
     where, params = _make_date_where(start_date,end_date,)
 
     conn = sqlite3.connect(DB_PATH)
