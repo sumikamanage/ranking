@@ -30,7 +30,7 @@ async def _send_ranking(
     color=discord.Color.blue(),
 ):
     if not rows:
-        return await interaction.response.send_message("ランキングが見つかりませんでした。")
+        return await interaction.followup.send("ランキングが見つかりませんでした。")
 
     lines = []
 
@@ -47,7 +47,7 @@ async def _send_ranking(
 
     embed.set_footer(text=footer)
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.followup.send(embed=embed)
 
 
 # ===============================
@@ -61,11 +61,13 @@ async def ranking(
     length: int = 10,
 ):
 
+    await interaction.response.defer()
+    
     if start < 1:
-        return await interaction.response.send_message("開始順位は1以上です。")
+        return await interaction.followup.send("開始順位は1以上です。")
 
     if length < 1:
-        return await interaction.response.send_message("表示件数は1以上です。")
+        return await interaction.followup.send("表示件数は1以上です。")
 
     length = min(length, 200)
 
@@ -91,12 +93,14 @@ async def ranking(
 @bot.tree.command(name="ranking_period")
 async def ranking_period(
     interaction: discord.Interaction,
-    start_date: str,
-    end_date: str,
+    start_date: str=None,
+    end_date: str=None,
     start: int = 1,
     length: int = 10,
 ):
 
+    await interaction.response.defer()
+    
     rows = get_message_ranking_slice(
         offset=start - 1,
         limit=min(length, 200),
@@ -124,11 +128,13 @@ async def ranking_length(
     length: int = 10,
 ):
 
+    await interaction.response.defer()
+    
     if start < 1:
-        return await interaction.response.send_message("開始順位は1以上です。")
+        return await interaction.followup.send("開始順位は1以上です。")
 
     if length < 1:
-        return await interaction.response.send_message("表示件数は1以上です。")
+        return await interaction.followup.send("表示件数は1以上です。")
 
     rows = get_message_length_ranking_slice(
         offset=start - 1,
@@ -152,12 +158,14 @@ async def ranking_length(
 @bot.tree.command(name="ranking_length_period")
 async def ranking_length_period(
     interaction: discord.Interaction,
-    start_date: str,
-    end_date: str,
+    start_date: str = None,
+    end_date: str = None,
     start: int = 1,
     length: int = 10,
 ):
 
+    await interaction.response.defer()
+    
     rows = get_message_length_ranking_slice(
         offset=start - 1,
         limit=min(length, 200),
@@ -184,6 +192,8 @@ async def myrank(
     interaction: discord.Interaction,
     member: discord.Member = None,
 ):
+    await interaction.response.defer()
+    
     target = member or interaction.user
 
     embed = await create_member_rank_embed(
@@ -192,7 +202,7 @@ async def myrank(
 
     embed.set_footer(text=footer)
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.followup.send(embed=embed)
 
 
 # ===============================
@@ -204,10 +214,13 @@ async def myrank(
 @bot.tree.command(name="myrank_period")
 async def myrank_period(
     interaction: discord.Interaction,
-    start_date: str,
-    end_date: str,
+    start_date: str = None,
+    end_date: str = None,
     member: discord.Member = None,
 ):
+
+    await interaction.response.defer()
+    
     target = member or interaction.user
 
     embed = await create_member_rank_embed(
@@ -220,7 +233,7 @@ async def myrank_period(
         text=f"{footer} | {start_date} ～ {end_date}"
     )
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.followup.send(embed=embed)
 
 
 # ===============================
@@ -231,6 +244,9 @@ async def myrank_length(
     interaction: discord.Interaction,
     member: discord.Member = None,
 ):
+
+    await interaction.response.defer()
+    
     target = member or interaction.user
 
     embed = await create_member_length_rank_embed(
@@ -239,7 +255,7 @@ async def myrank_length(
 
     embed.set_footer(text=footer)
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.followup.send(embed=embed)
 
 
 # ===============================
@@ -251,10 +267,13 @@ async def myrank_length(
 @bot.tree.command(name="myrank_length_period")
 async def myrank_length_period(
     interaction: discord.Interaction,
-    start_date: str,
-    end_date: str,
+    start_date: str = None,
+    end_date: str = None,
     member: discord.Member = None,
 ):
+
+    await interaction.response.defer()
+    
     target = member or interaction.user
 
     embed = await create_member_length_rank_embed(
@@ -267,7 +286,7 @@ async def myrank_length_period(
         text=f"{footer} | {start_date} ～ {end_date}"
     )
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.followup.send(embed=embed)
 
 
 print("✅ ranking.py loaded")
