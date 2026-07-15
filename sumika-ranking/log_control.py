@@ -41,6 +41,9 @@ def _save_message_to_db_sync(
         channel_id,
         created_at
     ))
+
+    print("INSERT:", message_id, "rowcount =", c.rowcount)
+    
     conn.commit()
     conn.close()
 
