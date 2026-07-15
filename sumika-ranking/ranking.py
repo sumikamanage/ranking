@@ -179,10 +179,10 @@ async def ranking_length_period(
         end_date=end_date,
     )
 
-    if start_date = "None":
+    if start_date == "None":
         start_date = "最初"
 
-    if end_date = "None":
+    if end_date == "None":
         end_date = "現在"
         
     await _send_ranking(
@@ -242,10 +242,10 @@ async def myrank_period(
     )
 
 
-    if start_date = "None":
+    if start_date == "None":
         start_date = "最初"
 
-    if end_date = "None":
+    if end_date == "None":
         end_date = "現在"
         
     embed.set_footer(
@@ -301,10 +301,10 @@ async def myrank_length_period(
         end_date=end_date,
     )
 
-    if start_date = "None":
+    if start_date == "None":
         start_date = "最初"
 
-    if end_date = "None":
+    if end_date == "None":
         end_date = "現在"
         
     embed.set_footer(
