@@ -108,6 +108,12 @@ async def ranking_period(
         end_date=end_date,
     )
 
+    if start_date = "None":
+        start_date = "最初"
+
+    if end_date = "None":
+        end_date = "現在"
+        
     await _send_ranking(
         interaction,
         rows,
@@ -121,7 +127,7 @@ async def ranking_period(
 # ===============================
 # 文字数ランキング
 # ===============================
-@bot.tree.command(name="ranking_length")
+@bot.tree.command(name="ranking_text")
 async def ranking_length(
     interaction: discord.Interaction,
     start: int = 1,
@@ -155,7 +161,7 @@ async def ranking_length(
 #
 # ranking_length_period
 # ===============================
-@bot.tree.command(name="ranking_length_period")
+@bot.tree.command(name="ranking_text_period")
 async def ranking_length_period(
     interaction: discord.Interaction,
     start_date: str = None,
@@ -173,6 +179,12 @@ async def ranking_length_period(
         end_date=end_date,
     )
 
+    if start_date = "None":
+        start_date = "最初"
+
+    if end_date = "None":
+        end_date = "現在"
+        
     await _send_ranking(
         interaction,
         rows,
@@ -229,6 +241,13 @@ async def myrank_period(
         end_date=end_date,
     )
 
+
+    if start_date = "None":
+        start_date = "最初"
+
+    if end_date = "None":
+        end_date = "現在"
+        
     embed.set_footer(
         text=f"{footer} | {start_date} ～ {end_date}"
     )
@@ -239,7 +258,7 @@ async def myrank_period(
 # ===============================
 # 個人文字数ランキング
 # ===============================
-@bot.tree.command(name="myrank_length")
+@bot.tree.command(name="myrank_text")
 async def myrank_length(
     interaction: discord.Interaction,
     member: discord.Member = None,
@@ -264,7 +283,7 @@ async def myrank_length(
 # 例
 # &myrank_length_period 2026-06-01 2026-06-30
 # ===============================
-@bot.tree.command(name="myrank_length_period")
+@bot.tree.command(name="myrank_text_period")
 async def myrank_length_period(
     interaction: discord.Interaction,
     start_date: str = None,
@@ -282,6 +301,12 @@ async def myrank_length_period(
         end_date=end_date,
     )
 
+    if start_date = "None":
+        start_date = "最初"
+
+    if end_date = "None":
+        end_date = "現在"
+        
     embed.set_footer(
         text=f"{footer} | {start_date} ～ {end_date}"
     )
