@@ -27,6 +27,8 @@ def _save_message_to_db_sync(
     channel_id: int,
     created_at: str,
 ):
+    print("SAVE DB:", DB_PATH)
+    
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
