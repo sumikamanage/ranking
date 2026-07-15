@@ -45,7 +45,10 @@ def _save_message_to_db_sync(
     ))
 
     print("INSERT:", message_id, "rowcount =", c.rowcount)
-    
+
+    c.execute("SELECT COUNT(*) FROM messages")
+print("TOTAL:", c.fetchone()[0])
+
     conn.commit()
     conn.close()
 
