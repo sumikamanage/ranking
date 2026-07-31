@@ -27,7 +27,7 @@ def _save_message_to_db_sync(
     channel_id: int,
     created_at: str,
 ):
-    print("SAVE DB:", DB_PATH)
+
     
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -43,11 +43,7 @@ def _save_message_to_db_sync(
         channel_id,
         created_at
     ))
-
-    print("INSERT:", message_id, "rowcount =", c.rowcount)
-
     c.execute("SELECT COUNT(*) FROM messages")
-    print("TOTAL:", c.fetchone()[0])
 
     conn.commit()
     conn.close()
