@@ -37,7 +37,9 @@ class RANK(commands.Bot):
             await self.load_extension("ranking_update")
             print("ranking_update loaded")
 
-        await bot.tree.sync()
+        await self.tree.sync()
+
+        print(self.cogs)
     async def on_ready(self):
         if getattr(self, "_initialized", False):
             return
