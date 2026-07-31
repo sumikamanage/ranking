@@ -67,4 +67,6 @@ class Update(commands.Cog):
 
 
 async def setup(bot):
+    print("setup() called")
     await bot.add_cog(Update(bot))
+    print("Update Cog added")
