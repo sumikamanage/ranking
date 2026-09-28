@@ -1,28 +1,23 @@
 import os
-import json
 import asyncio
-import time
-from datetime import datetime
 from threading import Thread
 from config import TOKEN
 
 import discord
-from discord.ext import commands
-
-from flask import Flask, redirect, request, session, url_for, jsonify
 from waitress import serve
 
 # 自作モジュール
-#botインスタンス読み込み
+# botインスタンス読み込み
 from bot import bot
 import ranking
 import messages_scan
-#flask起動
+# flask起動
 from web_app import app
 
 
 # bot落ち防止のためのuptimerobot用,起動に必要
 port = int(os.environ.get("PORT", 8080))
+
 
 def run():
     try:
@@ -36,24 +31,29 @@ def keep_alive():
     t = Thread(target=run)
     t.daemon = True
     t.start()
+
+
 print("🔄 サーバーを定義完了")
 
-# 実行部
 
+# 実行部
 async def main():
     async with bot:
-        await asyncio.sleep(30)
-        await bot.start(TOKEN)
-
-        
-
+        while True:
+            try:
+                await bot.start(TOKEN)
+                break
+            except discord.HTTPException as e:
+                # ログイン時の429(CloudflareによるIP制限を含む)。
+                # 落ちるとRenderが即再起動して試行が増えるので、プロセス内で長く待つ。
+                if e.status == 429:
+                    print("🚨 429: 15分待って再試行します")
+                    await asyncio.sleep(900)
+                else:
+                    raise
 
 
 # --- 実行セクション ---
-
-
-
 if __name__ == "__main__":
-    
     keep_alive()
     asyncio.run(main())
