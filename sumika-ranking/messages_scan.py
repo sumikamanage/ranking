@@ -1,39 +1,33 @@
 import discord
 import asyncio
-import os
 
 from discord import app_commands
 from discord.ext import commands
 
 from bot import bot
+import stats_store
 import message_count
-from message_count import full_scan, DB_PATH
 from config import GUILD_ID
 
 
-# ===============================
-# タスク管理
-# ===============================
-scan_task = None
-update_task = None
+def _start_catch_up(guild):
+    """追いつき処理を開始(bot.scan_task に保持して !stop_scan で止められるようにする)"""
+    bot.scan_task = asyncio.create_task(
+        stats_store.catch_up_all(
+            bot, guild, log=lambda t: message_count.send_log(bot, t)
+        )
+    )
 
 
 # ===============================
-# 初回フルスキャン
+# 初回フルスキャン(集計を消して、全履歴から作り直す)
 # ===============================
 @bot.tree.command(
     name="first_scan",
     description="DBを初期化してサーバー全体をスキャンします"
 )
 @app_commands.checks.has_permissions(administrator=True)
-async def first_scan(
-    interaction: discord.Interaction
-):
-    """
-    DBを初期化してサーバー全体をスキャン
-    """
-
-    global scan_task
+async def first_scan(interaction: discord.Interaction):
 
     guild = bot.get_guild(GUILD_ID)
 
@@ -42,81 +36,55 @@ async def first_scan(
             "❌ サーバーが取得できませんでした。"
         )
 
-    if message_count.is_updating:
+    if stats_store.is_running():
         return await interaction.response.send_message(
-            "⚠️ 現在、更新処理が実行中です。"
-        )
-
-    if message_count.is_scanning:
-        return await interaction.response.send_message(
-            "⚠️ すでにスキャン実行中です。"
-        )
-
-    if scan_task is not None and not scan_task.done():
-        return await interaction.response.send_message(
-            "⚠️ スキャンタスクがすでに存在します。"
+            "⚠️ すでにスキャン(更新)実行中です。"
         )
 
     await interaction.response.send_message(
-        "🔍 サーバー全体のスキャンを開始します…"
+        "🔍 集計をリセットして、サーバー全体を最初からスキャンします…"
     )
 
-    scan_task = asyncio.create_task(
-        full_scan(bot, guild)
-    )
+    await stats_store.reset_all()
+    _start_catch_up(guild)
 
 
 # ===============================
-# フルスキャン停止
+# スキャン停止(起動時の追いつきも止められる)
 # ===============================
 @bot.command(name="stop_scan")
 @commands.has_permissions(administrator=True)
 async def stop_scan(ctx):
 
-    global scan_task
+    task = bot.scan_task
 
-    if scan_task is None:
-        return await ctx.send(
-            "⚠️ 実行中のスキャンはありません。"
-        )
+    if task is None or task.done():
+        bot.scan_task = None
+        return await ctx.send("⚠️ 実行中のスキャンはありません。")
 
-    if scan_task.done():
-        scan_task = None
-        return await ctx.send(
-            "⚠️ スキャンはすでに終了しています。"
-        )
+    await ctx.send("🛑 スキャン停止要求を送信しました...")
 
-    await ctx.send(
-        "🛑 フルスキャン停止要求を送信しました..."
-    )
-
-    scan_task.cancel()
+    task.cancel()
 
     try:
-        await scan_task
-
+        await task
     except asyncio.CancelledError:
         pass
-
     finally:
-        scan_task = None
+        bot.scan_task = None
 
-    await ctx.send(
-        "✅ フルスキャンを停止しました。"
-    )
+    await ctx.send("✅ スキャンを停止しました。(進捗は保存済みで、次回は続きから再開します)")
 
 
 # ===============================
-# 増分更新
+# 差分更新(保存済み位置以降だけ取得)
 # ===============================
 @bot.tree.command(
     name="update_messages",
     description="メッセージの増分更新を実行します"
 )
 @app_commands.checks.has_permissions(administrator=True)
-async def update_messages(
-    interaction: discord.Interaction
-):
+async def update_messages(interaction: discord.Interaction):
 
     guild = bot.get_guild(GUILD_ID)
 
@@ -125,23 +93,23 @@ async def update_messages(
             "❌ サーバーが取得できませんでした。"
         )
 
-    if message_count.is_scanning:
+    if stats_store.is_running():
         return await interaction.response.send_message(
-            "⚠️ 現在スキャン中のため更新できません。"
-        )
-
-    if message_count.is_updating:
-        return await interaction.response.send_message(
-            "⚠️ すでに更新処理が実行中です。"
+            "⚠️ すでにスキャン(更新)実行中です。"
         )
 
     await interaction.response.send_message(
         "🔄 メッセージの増分更新を開始します…"
     )
 
-    asyncio.create_task(
-        message_count.incremental_update(
-            bot,
-            guild
-        )
-    )
+    _start_catch_up(guild)
+
+
+# ===============================
+# スラッシュコマンドの同期(コマンドを追加・変更したときだけ実行)
+# ===============================
+@bot.command(name="sync")
+@commands.has_permissions(administrator=True)
+async def sync(ctx):
+    synced = await bot.tree.sync()
+    await ctx.send(f"✅ {len(synced)} 件のコマンドを同期しました。")
