@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+import stats_store
+
 EXCLUDED_ROLE = [
     1473498996159942812,
 ]
@@ -28,7 +30,6 @@ class Update(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        print(f"🔴on_message発火: {message.author} : {message.content}")
         # Bot・DMは無視
         if message.author.bot or message.guild is None:
             return
@@ -49,8 +50,7 @@ class Update(commands.Cog):
             return
 
         try:
-            print("DB Queueに追加")
-            await self.bot.db_queue.put(message)
+            await stats_store.ingest_live(message)
 
         except Exception as e:
 
